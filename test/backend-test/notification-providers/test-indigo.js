@@ -9,13 +9,14 @@ describe("Indigo notification provider", () => {
     let baseUrl;
     let requests = [];
     let reply = {};
+    let status = 200;
 
     before(async () => {
         const app = express();
         app.use(express.json());
         app.post("/v2/api/command", (req, res) => {
             requests.push({ auth: req.headers.authorization, body: req.body });
-            res.json(reply);
+            res.status(status).json(reply);
         });
         await new Promise((resolve) => {
             server = app.listen(0, resolve);
@@ -53,6 +54,20 @@ describe("Indigo notification provider", () => {
 
     test("requires a variable or an action group", async () => {
         await assert.rejects(new Indigo().send(notification({}), "msg"), /variable ID, an action group ID/);
+    });
+
+    test("reports Indigo's HTTP 400 validation errors", async () => {
+        status = 400;
+        reply = {
+            id: "uptime-kuma",
+            validationErrors: { objectId: "id is not a valid Indigo Action Group" },
+            error: "invalid command payload received, id: 'uptime-kuma'",
+        };
+        await assert.rejects(
+            new Indigo().send(notification({ indigoActionGroupId: "1" }), "msg"),
+            /not a valid Indigo Action Group/
+        );
+        status = 200;
     });
 
     test("reports errors Indigo returns in the response body", async () => {

@@ -1,5 +1,6 @@
 const NotificationProvider = require("./notification-provider");
 const axios = require("axios");
+const https = require("https");
 
 class Indigo extends NotificationProvider {
     name = "Indigo";
@@ -40,6 +41,11 @@ class Indigo extends NotificationProvider {
                     "Content-Type": "application/json",
                 },
             };
+            // The Indigo Web Server on a LAN uses a self-signed certificate;
+            // the Reflector (NAME.indigodomo.net) has a valid one.
+            if (notification.indigoIgnoreTlsError) {
+                config.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+            }
             config = this.getAxiosConfigWithProxy(config);
 
             for (const command of commands) {

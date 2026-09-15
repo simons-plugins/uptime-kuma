@@ -16,6 +16,21 @@
     </div>
 
     <div class="mb-3">
+        <div class="form-check">
+            <input
+                id="indigo-ignore-tls-error"
+                v-model="$parent.notification.indigoIgnoreTlsError"
+                class="form-check-input"
+                type="checkbox"
+            />
+            <label class="form-check-label" for="indigo-ignore-tls-error">
+                {{ $t("Ignore TLS Error") }}
+            </label>
+        </div>
+        <div class="form-text">{{ $t("indigoIgnoreTlsErrorHelptext") }}</div>
+    </div>
+
+    <div class="mb-3">
         <label for="indigo-api-key" class="form-label">
             {{ $t("API Key") }}
             <span style="color: red"><sup>*</sup></span>
